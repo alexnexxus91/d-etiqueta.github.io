@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu D'Etiqueta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --orange: #f5a623;
+      --black: #0a0a0a;
+      --dark: #111111;
+      --white: #ffffff;
+      --gray: #888;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── QR Landing Page ── */
+    #qr-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+      background: var(--black);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #qr-page::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: var(--orange);
+      border-radius: 50%;
+      opacity: 0.08;
+      filter: blur(60px);
+    }
+
+    #qr-page::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 400px; height: 400px;
+      background: var(--orange);
+      border-radius: 50%;
+      opacity: 0.06;
+      filter: blur(80px);
+    }
+
+    .qr-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      letter-spacing: 0.05em;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .qr-logo span { color: var(--orange); }
+
+    .qr-tagline {
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 2.5rem;
+    }
+
+    .qr-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 0 0 6px var(--orange), 0 20px 60px rgba(245,166,35,0.3);
+      margin-bottom: 2rem;
+    }
+
+    .qr-instruction {
+      font-size: 0.85rem;
+      color: var(--gray);
+      max-width: 260px;
+      line-height: 1.6;
+    }
+
+    .qr-btn {
+      margin-top: 2rem;
+      display: inline-block;
+      background: var(--orange);
+      color: var(--black);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 0.8rem 2.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .qr-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(245,166,35,0.4);
+    }
+
+    /* ── Menu Page ── */
+    #menu-page {
+      display: none;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--black);
+      position: relative;
+    }
+
+    /* Header */
+    .menu-header {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .menu-header-bg {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80') center/cover no-repeat;
+      opacity: 0.55;
+      filter: saturate(1.3);
+    }
+
+    .menu-header-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.0) 40%, var(--black) 100%),
+                  linear-gradient(to top, var(--black) 0%, transparent 40%);
+    }
+
+    .menu-header-title {
+      position: absolute;
+      bottom: 18px;
+      right: 20px;
+      text-align: right;
+    }
+
+    .menu-header-title .label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      opacity: 0.75;
+    }
+
+    .menu-header-title .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .menu-header-title .brand span { color: var(--orange); }
+
+    /* Orange accent brush */
+    .brush {
+      position: absolute;
+      top: 16px; right: 0;
+      width: 140px; height: 28px;
+      background: var(--orange);
+      clip-path: polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%);
+      opacity: 0.9;
+    }
+
+    /* Nav tabs */
+    .menu-nav {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #222;
+      padding: 0 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .menu-nav::-webkit-scrollbar { display: none; }
+
+    .menu-nav button {
+      background: none;
+      border: none;
+      color: var(--gray);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 12px 18px;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .menu-nav button.active {
+      color: var(--orange);
+      border-bottom-color: var(--orange);
+    }
+
+    /* Sections */
+    .menu-content {
+      padding: 0 0 80px;
+    }
+
+    .menu-section {
+      display: none;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .menu-section.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Hero */
+    .section-hero {
+      padding: 24px 20px 8px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .section-icon {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      border: 3px solid var(--orange);
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #222;
+    }
+
+    .section-icon img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.06em;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .section-underline {
+      width: 40px; height: 2px;
+      background: var(--orange);
+      margin-top: 4px;
+    }
+
+    /* Category label */
+    .category-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+      color: var(--orange);
+      padding: 16px 20px 6px;
+    }
+
+    /* Group: image + items side by side */
+    .menu-group {
+      display: grid;
+      grid-template-columns: 1fr 72px;
+      align-items: center;
+      gap: 0 12px;
+      padding: 0 16px 0 20px;
+    }
+
+    /* Item rows */
+    .menu-items {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      width: 100%;
+    }
+
+    .menu-item:last-child { border-bottom: none; }
+
+    .item-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .item-name::before {
+      content: '• ';
+      color: var(--orange);
+    }
+
+    .item-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
+
+    /* Side image — sits in its own grid column, never overlaps text */
+    .side-img {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 3px solid var(--orange);
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: center;
+      justify-self: center;
+    }
+
+    .side-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Footer quality badge */
+    .quality-badge {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* Back button */
+    .back-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: var(--black);
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      padding: 0.7rem 2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(245,166,35,0.35);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ QR LANDING PAGE ══ -->
+<div id="qr-page">
+  <div class="qr-logo">Menu <span>D'</span>Etiqueta</div>
+  <div class="qr-tagline">Calidad garantizada</div>
+
+  <div class="qr-box">
+    <div id="qrcode"></div>
+  </div>
+
+  <p class="qr-instruction">Escanea el código QR con tu celular para ver el menú completo</p>
+
+  <button class="qr-btn" onclick="showMenu()">Ver Menú →</button>
+</div>
+
+<!-- ══ MENU PAGE ══ -->
+<div id="menu-page">
+
+  <!-- Header -->
+  <div class="menu-header">
+    <div class="menu-header-bg"></div>
+    <div class="menu-header-overlay"></div>
+    <div class="brush"></div>
+    <div class="menu-header-title">
+      <div class="label">MENU</div>
+      <div class="brand">D'<span>ETIQUETA</span></div>
+    </div>
+  </div>
+
+  <!-- Navigation tabs -->
+  <nav class="menu-nav">
+    <button class="active" onclick="switchTab('pizzas', this)">Pizzas</button>
+    <button onclick="switchTab('bebidas', this)">Bebidas</button>
+    <button onclick="switchTab('cervezas', this)">Cervezas</button>
+    <button onclick="switchTab('energizantes', this)">Energizantes</button>
+  </nav>
+
+  <div class="menu-content">
+
+    <!-- ── PIZZAS ── -->
+    <div class="menu-section active" id="pizzas">
+      <div class="section-hero">
+        <div class="section-icon">
+          <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=120&q=80" alt="Pizza"/>
+        </div>
+        <div>
+          <div class="section-title">Pizzas</div>
+          <div class="section-underline"></div>
+        </div>
+      </div>
+
+      <div class="menu-group">
+        <div class="menu-items">
+          <div class="menu-item">
+            <span class="item-name">Pizza Napolitana</span>
+            <span class="item-price">$400</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Pizza Doble Queso</span>
+            <span class="item-price">$600</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Agrego queso</span>
+            <span class="item-price">$200</span>
+          </div>
+        </div>
+        <div class="side-img">
+          <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=140&q=80" alt="pizza"/>
+        </div>
+      </div>
+
+      <div class="category-label">Agregos</div>
+      <div class="menu-group">
+        <div class="menu-items">
+          <div class="menu-item">
+            <span class="item-name">Chorizo</span>
+            <span class="item-price">$150</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Cebolla</span>
+            <span class="item-price">$100</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Atún</span>
+            <span class="item-price">$280</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Pimiento</span>
+            <span class="item-price">$80</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Lomo ahumado</span>
+            <span class="item-price">$200</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Jamón</span>
+            <span class="item-price">$100</span>
+          </div>
+        </div>
+        <div class="side-img">
+          <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=140&q=80" alt="topping"/>
+        </div>
+      </div>
+
+      <div class="quality-badge">✦ Calidad garantizada ✦</div>
+    </div>
+
+    <!-- ── BEBIDAS ── -->
+    <div class="menu-section" id="bebidas">
+      <div class="section-hero">
+        <div class="section-icon">
+          <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=120&q=80" alt="bebidas"/>
+        </div>
+        <div>
+          <div class="section-title">Bebidas</div>
+          <div class="section-underline"></div>
+        </div>
+      </div>
+
+      <div class="menu-group">
+        <div class="menu-items">
+          <div class="menu-item">
+            <span class="item-name">Refresco</span>
+            <span class="item-price">$300</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Jugos Cajita</span>
+            <span class="item-price">$200</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Jugos Latas</span>
+            <span class="item-price">$430</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Malta</span>
+            <span class="item-price">$400</span>
+          </div>
+        </div>
+        <div class="side-img">
+          <img src="https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=140&q=80" alt="bebida"/>
+        </div>
+      </div>
+
+      <div class="quality-badge">✦ Calidad garantizada ✦</div>
+    </div>
+
+    <!-- ── CERVEZAS ── -->
+    <div class="menu-section" id="cervezas">
+      <div class="section-hero">
+        <div class="section-icon">
+          <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=120&q=80" alt="cerveza"/>
+        </div>
+        <div>
+          <div class="section-title">Cervezas</div>
+          <div class="section-underline"></div>
+        </div>
+      </div>
+
+      <div class="menu-group">
+        <div class="menu-items">
+          <div class="menu-item">
+            <span class="item-name">Termo Cerveza 3L</span>
+            <span class="item-price">$2500</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Cristal Nacional</span>
+            <span class="item-price">$400</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Dragonskip</span>
+            <span class="item-price">$260</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Babaria 8·6</span>
+            <span class="item-price">$460</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Agua Mineral</span>
+            <span class="item-price">$150</span>
+          </div>
+        </div>
+        <div class="side-img">
+          <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=140&q=80" alt="cerveza"/>
+        </div>
+      </div>
+
+      <div class="quality-badge">✦ Calidad garantizada ✦</div>
+    </div>
+
+    <!-- ── ENERGIZANTES ── -->
+    <div class="menu-section" id="energizantes">
+      <div class="section-hero">
+        <div class="section-icon">
+          <img src="https://images.unsplash.com/photo-1622543925917-763c34d1a86e?w=120&q=80" alt="energizante"/>
+        </div>
+        <div>
+          <div class="section-title">Energizantes</div>
+          <div class="section-underline"></div>
+        </div>
+      </div>
+
+      <div class="menu-group">
+        <div class="menu-items">
+          <div class="menu-item">
+            <span class="item-name">Energí</span>
+            <span class="item-price">$250</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Jaguar Power</span>
+            <span class="item-price">$300</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Shaka</span>
+            <span class="item-price">$550</span>
+          </div>
+          <div class="menu-item">
+            <span class="item-name">Vodka caneca</span>
+            <span class="item-price">$500</span>
+          </div>
+        </div>
+        <div class="side-img">
+          <img src="https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=140&q=80" alt="energy"/>
+        </div>
+      </div>
+
+      <div class="quality-badge">✦ Calidad garantizada ✦</div>
+    </div>
+
+  </div><!-- /menu-content -->
+
+  <button class="back-btn" onclick="showQR()">← Ver QR</button>
+</div>
+
+<script>
+  // Generate QR pointing to THIS page
+  const menuURL = window.location.href.split('?')[0];
+
+  new QRCode(document.getElementById("qrcode"), {
+    text: menuURL + "?menu=1",
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Auto-open menu if QR was scanned (?menu=1)
+  if (window.location.search.includes('menu=1')) {
+    showMenu();
+  }
+
+  function showMenu() {
+    document.getElementById('qr-page').style.display = 'none';
+    document.getElementById('menu-page').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function showQR() {
+    document.getElementById('menu-page').style.display = 'none';
+    document.getElementById('qr-page').style.display = 'flex';
+  }
+
+  function switchTab(sectionId, btn) {
+    document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu-nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
